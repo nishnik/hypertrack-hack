@@ -23,7 +23,10 @@ Clone this repository
 $ https://github.com/hypertrack/quickstart-android.git
 ```
 
-#### Step 2. Signup [here](https://dashboard.hypertrack.com/signup) and get your test publishable key from dashboard [settings]([dashboard](https://dashboard.hypertrack.com/settings)) then add the test publishable key to [MyApplication](https://github.com/hypertrack/quickstart-android/blob/master/app/src/main/java/com/hypertrack/quickstart/MyApplication.java#L24) file.
+#### Step 2. Signup and get Test Publishable key.
+1. Signup [here](https://dashboard.hypertrack.com/signup).
+2. Get `test` publishable key from [dashboard](https://dashboard.hypertrack.com/settings) settings page.
+3. Add the test publishable key to [MyApplication](https://github.com/hypertrack/quickstart-android/blob/mock-tracking/app/src/main/java/com/hypertrack/quickstart/MyApplication.java) file.
 ```java
 HyperTrack.initialize(this.getApplicationContext(), TEST_PUBLISHABLE_KEY);
 ```
@@ -33,7 +36,7 @@ By default, project is configured with test FCM credentials.
 Add `AAAAckZ1H20:APA91bEyilv0qgVyfSECb-jZxsgetGyKyJGVIavCOLhWn5GdI0aQBz76dPKAf5P73fVBE7OXoS5QicAV5ASrmcyhizGnNbD0DhwJPVSZaLKQrRGYH3Bam-7WGe3OEX_Chhf7CEPToVw0` as FCM server key on HyperTrack [dashboard](https://dashboard.hypertrack.com/settings).
 
 But if you want to use your FCM configuration then replace `FCM Server Key` on HyperTrack [dashboard](https://dashboard.hypertrack.com/settings) with yours FCM server key and replace 
-[google-service.json](https://github.com/hypertrack/quickstart-android/blob/master/app/google-services.json) .
+[google-service.json](https://github.com/hypertrack/quickstart-android/blob/mock-tracking/app/google-services.json) .
 
 ## Usage
 
@@ -53,9 +56,9 @@ if (!HyperTrack.checkLocationServices(this)) {
 ```
 
 #### Step 2. Create HyperTrack User & Start Tracking
-The next thing that you need to do is to create a HyperTrack user. More details about the function [here](https://docs.hypertrack.com/sdks/android/basic.html#step-1-create-sdk-user).
+The next thing that you need to do is to create a HyperTrack user. More details about the function [here](https://docs.hypertrack.com/sdks/android/reference/user.html#getorcreate-user).
 
-When the user is created, we need to start tracking his location and activity. Call the following method to do so ```HyperTrack.startMockTracking()```. Refer [here](https://docs.hypertrack.com/sdks/android/reference/hypertrack.html#void-startmocktracking) for more detail 
+When the user is created, we need to start tracking his location and activity. Call the following method to do so ```HyperTrack.startMockTracking()```. Refer [here](https://docs.hypertrack.com/sdks/android/reference/hypertrack.html#void-startmocktracking) for more detail. 
 
 ```java
 // Get User details, if specified
@@ -97,7 +100,7 @@ HyperTrack.getOrCreateUser(userParams, new HyperTrackCallback() {
 ```
 
 #### Step 4. Stop Tracking
-When user logs out call `HyperTracking.stopMockTracking()` to stop tracking the user's location and activity. Refer [here](https://docs.hypertrack.com/sdks/android/reference/hypertrack.html#void-stopmocktracking) for more detail
+When user logs out call `HyperTracking.stopMockTracking()` to stop tracking the user's location and activity. Refer [here](https://docs.hypertrack.com/sdks/android/reference/hypertrack.html#void-stopmocktracking) for more detail.
 
 ```java
 HyperTrack.stopMockTracking();
