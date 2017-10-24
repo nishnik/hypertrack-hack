@@ -37,7 +37,8 @@ public class MainActivity extends BaseActivity {
             Toast.makeText(MainActivity.this, R.string.main_logout_success_msg, Toast.LENGTH_SHORT).show();
 
             // Stop HyperTrack SDK
-            HyperTrack.stopTracking();
+            //Refer here for more detail https://docs.hypertrack.com/sdks/android/reference/hypertrack.html#void-stopmocktracking
+            HyperTrack.stopMockTracking();
 
             // Proceed to LoginActivity for a fresh User Login
             Intent loginIntent = new Intent(MainActivity.this, LoginActivity.class);
