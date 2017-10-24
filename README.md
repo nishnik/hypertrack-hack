@@ -1,5 +1,5 @@
 # Sample Android App using HyperTrack SDK
-Example app for Android SDK Onboarding flow
+A simple Android application demonstrating the use of HyperTrack SDK.
 
 HyperTrack Onboarding link: https://dashboard.hypertrack.com/onboarding/sdk/android
 
