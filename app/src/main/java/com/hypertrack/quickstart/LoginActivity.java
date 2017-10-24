@@ -36,7 +36,7 @@ public class LoginActivity extends BaseActivity {
         setContentView(R.layout.activity_login);
 
         // Check if user is logged in
-        if (HyperTrack.isTracking()) {
+        if (HyperTrack.isMockTracking()) {
             Intent mainActivityIntent = new Intent(this, MainActivity.class);
             startActivity(mainActivityIntent);
             finish();
@@ -136,8 +136,6 @@ public class LoginActivity extends BaseActivity {
         HyperTrack.getOrCreateUser(userParams, new HyperTrackCallback() {
             @Override
             public void onSuccess(@NonNull SuccessResponse successResponse) {
-                // Hide Login Button loader
-                loginBtnLoader.setVisibility(View.GONE);
 
                 User user = (User) successResponse.getResponseObject();
                 String userId = user.getId();
