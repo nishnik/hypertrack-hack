@@ -24,7 +24,7 @@ If you want to directly build the flow in your own app or wanted to create a new
 Clone this repository
 ```bash
 # Clone this repository
-$ https://github.com/hypertrack/quickstart-android.git
+$ git clone https://github.com/hypertrack/quickstart-android.git
 ```
 
 #### Step 2. Signup and get Test Publishable key.
