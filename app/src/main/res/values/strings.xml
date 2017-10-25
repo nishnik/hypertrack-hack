@@ -9,7 +9,7 @@
     <string name="login_phone_number_hint">Your Phone Number</string>
     <string name="login_lookup_id_hint">Lookup Id</string>
     <string name="login_lookup_id_description">* A lookupId is a unique id that will be added with
-        the user for unique identification. By default, it will be android Amandevice id.</string>
+        the user for unique identification. By default, it will be android device id.</string>
 
     <string name="login_username_empty_error">Username can\'t be empty. Please try again</string>
     <string name="login_username_invalid_error">Username is invalid. Please try again</string>
