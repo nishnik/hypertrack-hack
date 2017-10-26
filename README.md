@@ -13,13 +13,11 @@ HyperTrack Onboarding link: https://dashboard.hypertrack.com/onboarding/sdk/andr
 </p>
 
 ## Requirements
-1. [Android Studio](https://developer.android.com/studio/index.html) with emulator (or test device)
-2. HyperTrack API keys. Learn more about them [here](https://docs.hypertrack.com/gettingstarted/authentication.html), and sign up for them [here](https://dashboard.hypertrack.com/signup).
+[Android Studio](https://developer.android.com/studio/index.html) with emulator (or test device)
 
 ## Basic Setup
 
 #### Step 1. Clone this repository
-If you want to directly build the flow in your own app or wanted to create a new project, you can ignore this step.
 
 Clone this repository
 ```bash
@@ -36,11 +34,9 @@ HyperTrack.initialize(this.getApplicationContext(), TEST_PUBLISHABLE_KEY);
 ```
 
 #### Step 3. FCM Configuration
-By default, project is configured with test FCM credentials.
-Add `AAAAckZ1H20:APA91bEyilv0qgVyfSECb-jZxsgetGyKyJGVIavCOLhWn5GdI0aQBz76dPKAf5P73fVBE7OXoS5QicAV5ASrmcyhizGnNbD0DhwJPVSZaLKQrRGYH3Bam-7WGe3OEX_Chhf7CEPToVw0` as FCM server key on HyperTrack [dashboard](https://dashboard.hypertrack.com/settings).
+The SDK has a bi-directional communication model with the server. This enables the SDK to run on a variable frequency model, which balances the fine trade-off between low latency tracking and battery efficiency, and improve robustness. For this purpose, the Android SDK uses FCM or GCM silent notifications.
 
-But if you want to use your FCM configuration then replace `FCM Server Key` on HyperTrack [dashboard](https://dashboard.hypertrack.com/settings) with yours FCM server key and replace 
-[google-service.json](https://github.com/hypertrack/quickstart-android/blob/mock-tracking/app/google-services.json) .
+Refer to the [FCM Integration Guide](https://docs.hypertrack.com/sdks/android/gcm-integration.html#locate-your-gcmfcm-key).
 
 ## Usage
 
