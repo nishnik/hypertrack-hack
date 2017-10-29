@@ -41,8 +41,8 @@ public class MainActivity extends BaseActivity {
         trackingToggle.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (HyperTrack.isTracking()) {
-                    HyperTrack.stopTracking(new HyperTrackCallback() {
+                if (HyperTrack.isMockTracking()) {
+                    HyperTrack.stopMockTracking(new HyperTrackCallback() {
                         @Override
                         public void onSuccess(@NonNull SuccessResponse successResponse) {
                             trackingToggle.setText(R.string.start_mock_tracking);
@@ -54,7 +54,7 @@ public class MainActivity extends BaseActivity {
                         }
                     });
                 } else {
-                    HyperTrack.startTracking(new HyperTrackCallback() {
+                    HyperTrack.startMockTracking(new HyperTrackCallback() {
                         @Override
                         public void onSuccess(@NonNull SuccessResponse successResponse) {
                             trackingToggle.setText(R.string.stop_mock_tracking);
