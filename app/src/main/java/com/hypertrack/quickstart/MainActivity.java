@@ -43,6 +43,7 @@ public class MainActivity extends BaseActivity {
             public void onClick(View v) {
                 if (HyperTrack.isMockTracking()) {
                     HyperTrack.stopMockTracking(new HyperTrackCallback() {
+
                         @Override
                         public void onSuccess(@NonNull SuccessResponse successResponse) {
                             trackingToggle.setText(R.string.start_mock_tracking);

@@ -10,8 +10,10 @@ import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import com.google.gson.GsonBuilder;
@@ -32,47 +34,47 @@ public class LoginActivity extends BaseActivity {
     private EditText nameText, phoneNumberText, lookupIdText;
     private LinearLayout loginBtnLoader;
     public static final String HT_QUICK_START_SHARED_PREFS_KEY = "com.hypertrack.quickstart:SharedPreference";
+    String[] mobileArray = {"Android","IPhone","WindowsMobile","Blackberry",
+            "WebOS","Ubuntu","Windows7","Max OS X"};
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-
+        checkForLocationSettings();
         // Check if user is logged in
-        if (getUser() != null) {
-            Intent mainActivityIntent = new Intent(this, MainActivity.class);
-            startActivity(mainActivityIntent);
-            finish();
-            return;
-        }
+//        if (getUser() != null) {
+//            Intent mainActivityIntent = new Intent(this, MainActivity.class);
+//            startActivity(mainActivityIntent);
+//            finish();
+//            return;
+//        }
 
         // Initialize Toolbar
-        initToolbar(getString(R.string.login_activity_title));
+        initToolbar("Tasks");
+        ArrayAdapter adapter = new ArrayAdapter<String>(this,
+                R.layout.activity_listview, mobileArray);
 
+        ListView listView = (ListView) findViewById(R.id.mobile_list);
+        listView.setAdapter(adapter);
         // Initialize UI Views
-        initUIViews();
+
     }
 
     /**
      * Call this method to initialize UI views and handle listeners for these
      * views
      */
-    private void initUIViews() {
-        // Initialize UserName Views
-        nameText = (EditText) findViewById(R.id.login_name);
-
-        // Initialize Password Views
-        phoneNumberText = (EditText) findViewById(R.id.login_phone_number);
-
-        //Initialize lookupIdText
-        lookupIdText = (EditText) findViewById(R.id.login_lookup_id);
-        String UUID = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
-        lookupIdText.setText(UUID);
-
-        // Initialize Login Btn Loader
-        loginBtnLoader = (LinearLayout) findViewById(R.id.login_btn_loader);
-    }
+//    private void initUIViews() {
+//        // Initialize UserName Views
+//        ListView simpleList;
+//        String countryList[] = {"India", "China", "australia", "Portugle", "America", "NewZealand"};
+//        simpleList = (ListView)findViewById(R.id.simpleListView);
+//        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, R.layout.activity_listview, R.id.textView, countryList);
+//        simpleList.setAdapter(arrayAdapter);
+//
+//    }
 
     /**
      * Call this method when User Login button has been clicked.
@@ -82,11 +84,11 @@ public class LoginActivity extends BaseActivity {
      *
      * @param view
      */
-    public void onLoginButtonClick(View view) {
-        // Check if Location Settings are enabled, if yes then attempt
-        // DriverLogin
-        checkForLocationSettings();
-    }
+//    public void onLoginButtonClick(View view) {
+//        // Check if Location Settings are enabled, if yes then attempt
+//        // DriverLogin
+//        checkForLocationSettings();
+//    }
 
     /**
      * Call this method to check Location Settings before proceeding for User
@@ -118,12 +120,12 @@ public class LoginActivity extends BaseActivity {
     private void attemptUserLogin() {
 
         // Show Login Button loader
-        loginBtnLoader.setVisibility(View.VISIBLE);
+//        loginBtnLoader.setVisibility(View.VISIBLE);
 
         // Get User details, if specified
-        final String name = nameText.getText().toString();
-        final String phoneNumber = phoneNumberText.getText().toString();
-        final String lookupId = !HTTextUtils.isEmpty(lookupIdText.getText().toString()) ? lookupIdText.getText().toString() : phoneNumber;
+        final String name = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
+        final String phoneNumber = "+919933979842";
+        final String lookupId = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID) + "_ne";
 
         UserParams userParams = new UserParams().setName(name).setPhone(phoneNumber).setLookupId(lookupId);
         /**
@@ -154,7 +156,7 @@ public class LoginActivity extends BaseActivity {
             @Override
             public void onError(@NonNull ErrorResponse errorResponse) {
                 // Hide Login Button loader
-                loginBtnLoader.setVisibility(View.GONE);
+//                loginBtnLoader.setVisibility(View.GONE);
 
                 Toast.makeText(LoginActivity.this, R.string.login_error_msg + " " + errorResponse.getErrorMessage(), Toast.LENGTH_SHORT).show();
             }
@@ -169,28 +171,32 @@ public class LoginActivity extends BaseActivity {
         /**
          * See more method of user's mock tracking session https://docs.hypertrack.com/sdks/android/reference/hypertrack.html#void-startmocktracking
          * */
-        HyperTrack.startMockTracking(new HyperTrackCallback() {
-            @Override
-            public void onSuccess(@NonNull SuccessResponse successResponse) {
-                // Hide Login Button loader
-                loginBtnLoader.setVisibility(View.GONE);
+        if(1!=1)
+        return;
+        else {
+            HyperTrack.startMockTracking(new HyperTrackCallback() {
+                @Override
+                public void onSuccess(@NonNull SuccessResponse successResponse) {
+                    // Hide Login Button loader
+//                loginBtnLoader.setVisibility(View.GONE);
 
-                Toast.makeText(LoginActivity.this, R.string.login_success_msg, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(LoginActivity.this, R.string.login_success_msg, Toast.LENGTH_SHORT).show();
 
-                // Start User Session by starting MainActivity
-                Intent mainActivityIntent = new Intent(LoginActivity.this, MainActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                startActivity(mainActivityIntent);
-                finish();
-            }
+                    // Start User Session by starting MainActivity
+                    Intent mainActivityIntent = new Intent(LoginActivity.this, MainActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    startActivity(mainActivityIntent);
+                    finish();
+                }
 
-            @Override
-            public void onError(@NonNull ErrorResponse errorResponse) {
-                // Hide Login Button loader
-                loginBtnLoader.setVisibility(View.GONE);
+                @Override
+                public void onError(@NonNull ErrorResponse errorResponse) {
+                    // Hide Login Button loader
+//                loginBtnLoader.setVisibility(View.GONE);
 
-                Toast.makeText(LoginActivity.this, R.string.login_error_msg + " " + errorResponse.getErrorMessage(), Toast.LENGTH_SHORT).show();
-            }
-        });
+                    Toast.makeText(LoginActivity.this, R.string.login_error_msg + " " + errorResponse.getErrorMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
     }
 
     /**
