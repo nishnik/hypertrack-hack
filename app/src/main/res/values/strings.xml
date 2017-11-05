@@ -31,4 +31,5 @@
     <string name="on_logout_tracking_will_be_stopped">On logout tracking will be stopped.</string>
     <string name="start_mock_tracking">Start Mock Tracking</string>
     <string name="stop_mock_tracking">Stop Mock Tracking</string>
+    <string name="btn_txt">Add a Task</string>
 </resources>

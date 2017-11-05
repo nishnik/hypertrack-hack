@@ -1,16 +1,32 @@
 package com.hypertrack.quickstart;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.os.Handler;
+import android.os.StrictMode;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.content.ContextCompat;
+import android.text.InputType;
+import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -25,24 +41,283 @@ import com.hypertrack.lib.models.SuccessResponse;
 import com.hypertrack.lib.models.User;
 import com.hypertrack.lib.models.UserParams;
 
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.Console;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.Timer;
+import java.util.TimerTask;
+
 /**
  * Created by Aman on 24/10/17.
  */
 
 public class LoginActivity extends BaseActivity {
-
+    private Context context;
     private EditText nameText, phoneNumberText, lookupIdText;
     private LinearLayout loginBtnLoader;
     public static final String HT_QUICK_START_SHARED_PREFS_KEY = "com.hypertrack.quickstart:SharedPreference";
-    String[] mobileArray = {"Android","IPhone","WindowsMobile","Blackberry",
-            "WebOS","Ubuntu","Windows7","Max OS X"};
+    String name = "LOGGING";
+    String[] listViewArray = {};
+    private String[] readFromFile() {
+        String pathoffile;
+        String contents="";
+        String[] toReturn = {};
+        File mFolder = new File(getFilesDir() + "/sample");
+        File myFile = new File(mFolder.getAbsolutePath() + "/myData.txt");
+        if(!myFile.exists()) {
+            Log.e(name, "file not");
+            return toReturn;
+        }
+        try {
+            BufferedReader br = new BufferedReader(new FileReader(myFile));
+            int c;
+            while ((c = br.read()) != -1) {
+                contents=contents+(char)c;
+            }
+            toReturn = contents.split("-");
+
+        }
+        catch (IOException e) {
+            //You'll need to add proper error handling here
+            Log.e(name, e.toString());
+            return toReturn;
+        }
+        return toReturn;
+    }
+
+    private void writeToFile(String[] toWrite) {
+        String pathoffile;
+        String contents="";
+        for (int i =0;i<toWrite.length;i++) {
+            contents += (toWrite[i] + '-');
+        }
+        Log.e(name, "Start Write");
+//        File myFoo = new File(android.os.Environment.getExternalStorageDirectory(), "/myData.txt");
+        File mFolder = new File(getFilesDir() + "/sample");
+        Log.e(name, mFolder.getAbsolutePath());
+        File myFoo = new File(mFolder.getAbsolutePath() + "/myData.txt");
+        if (!mFolder.exists()) {
+            mFolder.mkdir();
+        }
+        // See http://stackoverflow.com/questions/3551821/android-write-to-sd-card-folder
+
+//        File myFoo = new File (root.getAbsolutePath() + "/myData.txt");
+        if(!myFoo.exists()) {
+            try {
+                myFoo.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        FileOutputStream fooStream;
+        try {
+            FileWriter fooWriter = new FileWriter(myFoo, false); // true to append
+            fooWriter.write(contents);
+            fooWriter.close();
+        }
+        catch (IOException e) {
+            //You'll need to add proper error handling here
+            Log.e(name, e.toString());
+            e.printStackTrace();
+            return;
+        }
+        Log.e(name, "END WRITE");
+    }
+    private void createNotification(String text, String link){
+
+        NotificationCompat.Builder notificationBuilder =
+                new NotificationCompat.Builder(this)
+                        .setAutoCancel(true)
+                        .setSmallIcon(R.drawable.ic_battery_icon)
+                        .setContentTitle(text);
+
+        NotificationManager mNotificationManager =
+                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+        // pending implicit intent to view url
+        Intent resultIntent = new Intent(Intent.ACTION_VIEW);
+        resultIntent.setData(Uri.parse(link));
+
+        PendingIntent pending = PendingIntent.getActivity(this, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        notificationBuilder.setContentIntent(pending);
+
+        // using the same tag and Id causes the new notification to replace an existing one
+        mNotificationManager.notify(1, notificationBuilder.build());
+    }
+
+    private void checkNearby () {
+        Thread thread = new Thread(new Runnable() {
+
+            @Override
+            public void run() {
+                try  {
+                    String url = "http://10.67.13.83:5000/peace/user_notice?user_id=" +Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID) + "_ne";//user_id=tempid&is_add=1&task=temp%20task
+                    File mFolder = new File(getFilesDir() + "/sample");
+                    File output = new File(mFolder.getAbsolutePath() + "/output.txt");
+                    HttpRequest.get(url).receive(output);
+                    File myFile = output;
+                    String contents = "";
+                    if(!myFile.exists()) {
+                        Log.e(name, "file not");
+                        return;
+                    }
+                    try {
+                        BufferedReader br = new BufferedReader(new FileReader(myFile));
+                        int c;
+                        while ((c = br.read()) != -1) {
+                            contents=contents+(char)c;
+                        }
+
+                    if (contents.length() != 0) {
+                        JSONObject jObject = new JSONObject(contents);
+                        String lat = jObject.getString("lat");
+                        String lng = jObject.getString("lng");
+
+                        String url_to_s = "https://maps.google.com/maps?daddr="+lat+","+lng;
+                        Log.e("checkkk", url_to_s);
+                        createNotification("Hey Peace here! One of your task is nearby!", url_to_s);
+                    }
+
+                    }
+                    catch (IOException e) {
+                        //You'll need to add proper error handling here
+                        Log.e(name, e.toString());
+
+                    }
+                Log.e("checkNearby", contents);
+
+                    //Your code goes here
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        thread.start();
+    }
+
+    private View.OnClickListener addTask = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+//            Intent mainActivityIntent = new Intent(LoginActivity.this, MainActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+//            startActivity(mainActivityIntent);
+//            finish();
+            AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this);
+            builder.setTitle("Add new Task");
+
+// Set up the input
+//            this.context = context;
+            final EditText input = new EditText(LoginActivity.this);
+// Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
+            input.setInputType(InputType.TYPE_CLASS_TEXT);
+            builder.setView(input);
+
+// Set up the buttons
+            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    final String m_Text = input.getText().toString();
+                    listViewArray = increaseArray(listViewArray, 1);
+                    listViewArray[listViewArray.length-1] = m_Text;
+
+                    Thread thread = new Thread(new Runnable() {
+
+                        @Override
+                        public void run() {
+                            try  {
+                                String url = "http://10.67.13.83:5000/peace/user_add_del";//user_id=tempid&is_add=1&task=temp%20task
+
+                                int response = HttpRequest.post(url).send("user_id="+Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID) + "_ne&is_add=1&task="+m_Text).code();
+                                //Your code goes here
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    });
+
+                    thread.start();
+
+
+                    ArrayAdapter adapter = new ArrayAdapter<String>(LoginActivity.this,
+                            R.layout.activity_listview, listViewArray);
+
+                    ListView listView = (ListView) findViewById(R.id.mobile_list);
+                    listView.setBackgroundColor(Color.CYAN);
+                    listView.setAdapter(adapter);
+
+                }
+            });
+            builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.cancel();
+                }
+            });
+
+            builder.show();
+
+        }
+    };
+
+    public String[] increaseArray(String[] theArray, int increaseBy)
+    {
+        int i = theArray.length;
+        int n = ++i;
+        String[] newArray = new String[n];
+        for(int cnt=0;cnt<theArray.length;cnt++)
+        {
+            newArray[cnt] = theArray[cnt];
+        }
+        return newArray;
+    }
+    public String[] delFromArray(final String[] theArray, final int ind)
+    {
+        int i = theArray.length;
+        int n = --i;
+//        Thread thread = new Thread(new Runnable() {
+//
+//            @Override
+//            public void run() {
+//                try  {
+//                    String url = "http://192.168.88.105:5000/peace/user_add_del";//user_id=tempid&is_add=1&task=temp%20task
+//
+//                    int response = HttpRequest.post(url).send("user_id="+Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID) + "_ne&is_add=0&task="+theArray[ind]).code();
+//                    //Your code goes here
+//                } catch (Exception e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        });
+//        thread.start();
+        String[] newArray = new String[n];
+        Log.e("delfromarr",Integer.toString(ind));
+        for(int cnt=0;cnt<theArray.length;cnt++)
+        {
+            if (cnt < ind)
+            newArray[cnt] = theArray[cnt];
+            else if (ind!=cnt)
+                newArray[cnt-1] = theArray[cnt];
+        }
+
+        return newArray;
+    }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
+        context = this.context;
         setContentView(R.layout.activity_login);
         checkForLocationSettings();
+        final Button trackingToggle = (Button) findViewById(R.id.tracking_toggle);
+        trackingToggle.setOnClickListener(addTask);
         // Check if user is logged in
 //        if (getUser() != null) {
 //            Intent mainActivityIntent = new Intent(this, MainActivity.class);
@@ -53,11 +328,81 @@ public class LoginActivity extends BaseActivity {
 
         // Initialize Toolbar
         initToolbar("Tasks");
+
+//        String[] listViewArray = readFromFile();
+//        writeToFile(listViewArray);
         ArrayAdapter adapter = new ArrayAdapter<String>(this,
-                R.layout.activity_listview, mobileArray);
+                R.layout.activity_listview, listViewArray);
 
         ListView listView = (ListView) findViewById(R.id.mobile_list);
+        listView.setBackgroundColor(Color.CYAN);
         listView.setAdapter(adapter);
+        listView.setLongClickable(true);
+        listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            public boolean onItemLongClick(AdapterView<?> parent, View v, final int position, long id) {
+                //Do your tasks here
+
+
+                AlertDialog.Builder alert = new AlertDialog.Builder(
+                        LoginActivity.this);
+                alert.setTitle("Delete a Task!");
+                alert.setMessage("Are you sure to delete record");
+                alert.setPositiveButton("YES", new DialogInterface.OnClickListener() {
+
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        //do your work here
+
+                        listViewArray = delFromArray(listViewArray, position);
+
+                        ArrayAdapter adapter = new ArrayAdapter<String>(LoginActivity.this,
+                                R.layout.activity_listview, listViewArray);
+
+                        ListView listView = (ListView) findViewById(R.id.mobile_list);
+                        listView.setBackgroundColor(Color.CYAN);
+                        listView.setAdapter(adapter);
+
+                        dialog.dismiss();
+
+                    }
+                });
+                alert.setNegativeButton("NO", new DialogInterface.OnClickListener() {
+
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                        dialog.dismiss();
+                    }
+                });
+
+                alert.show();
+
+                return true;
+            }
+        });
+
+        final Handler handler = new Handler();
+        Timer timer = new Timer();
+        TimerTask doAsynchronousTask = new TimerTask() {
+            @Override
+            public void run() {
+
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            Log.e("inside", "hello");
+                            checkNearby();
+                        }
+                        catch (Exception e) {
+
+                        }
+                    }
+                });
+            }
+        };
+        timer.schedule(doAsynchronousTask, 0,10000);
+
         // Initialize UI Views
 
     }
@@ -171,7 +516,7 @@ public class LoginActivity extends BaseActivity {
         /**
          * See more method of user's mock tracking session https://docs.hypertrack.com/sdks/android/reference/hypertrack.html#void-startmocktracking
          * */
-        if(1!=1)
+        if(1==1)
         return;
         else {
             HyperTrack.startMockTracking(new HyperTrackCallback() {
